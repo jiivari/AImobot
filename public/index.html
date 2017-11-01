@@ -1,35 +1,63 @@
-<!doctype html>
 <html>
   <head>
     <title>Spotify search songs</title>
-    <link rel="stylesheet" href="/style.css">
-    <style type="text/css">
-      #login, #loggedin {
-        display: none;
-      }
-      .text-overflow {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 500px;
-      }
-    </style>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+      <style type="text/css">
+        html {
+          font-family: GillSans, Calibri, Trebuchet, sans-serif;
+        }
+        #login, #loggedin {
+          display: none;
+        }
+        .text-overflow {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 500px;
+        }
+      </style>
   </head>
 
-  <body>
+  <body style="">
     <div class="container">
-      <div id="login">
-        <a href="/login"><img class="media-object" width="500" src="http://www.digia.com/globalassets/yritys/logo/digia_logo_cmyk.png" /></a></a>
+      <div id="login" style="display: none;">
+        <a href="/login"><img class="media-object" width="500" src="http://www.digia.com/globalassets/yritys/logo/digia_logo_cmyk.png"></a>
       </div>
-      <div id="loggedin">
-        <div id="twitter-selection"></div>
-        <div id="user-profile">
+      <div id="loggedin" style="display: block;">
+        <div id="twitter-selection">
+          <div id="handles">
+            <div class="col s12 m7" style="">
+              <h2 class="header">Let your voice out</h2>
+              <div class="card horizontal" style="">
+                <div class="card-image" style="">
+                  <img src="/Aimo.PNG" style="">
+                </div>
+                <div class="card-stacked">
+                  <div class="card-content">
+                    <h3>Give your profile data, Aimo suggest music you could like<p></p></h3>
+                    <form id="handle" action="/get-twitter" method="get">
+                      <input type="text" name="thandle" maxlength="100" placeholder="Your Twitter name!" style="border: 2px solid purple;border-radius: 8px;">
+                      <input type="hidden" name="access_token" value="{{access_token}}">
+        		            <textarea rows="10" cols="100" name="profile" maxlength="5000" placeholder="Tell us more about you!" style="border: 2px solid purple;border-radius: 8px;"></textarea>
+                        <button type="submit" class="btn btn-large waves-effect waves-light purple">Get recommendation from Aimo</button>
+                    </form>
+
+                    <div id="user-profile">
+                      <h5>Logged in as {{display_name}}</h5>
+                    </div>
+                    <div id="oauth">
+                      <button class="btn btn-default waves-effect waves-light grey" id="obtain-new-token">Obtain new token using the refresh token</button><br><br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="oauth">
-        </div>
-      </div>
-      <div id="aimo">
-        <img class="media-object" src="/Aimo.PNG" />
       </div>
     </div>
 
@@ -40,11 +68,12 @@
         <form id="handle" action="/get-twitter" method="get">
           <input type="text" name="thandle" maxlength="100" placeholder="Your Twitter name!">
           <input type="hidden" name="access_token" value="{{access_token}}"></input>
-  		    <textarea rows="10" cols="100" name="profile" maxlength="5000" placeholder="Tell us more about you!"></textarea>
+          <div class="input-field col s12">
+            <textarea class="materialize-textarea" rows="10" cols="100" name="profile" maxlength="5000" placeholder="Tell us more about you!" style="border: 2px solid purple;border-radius: 8px;"></textarea>
+          </div>
           <button type="submit">Submit</button>
         </form>
       </div>
-
     </script>
 
 
@@ -53,11 +82,11 @@
     </script>
 
     <script id="oauth-template" type="text/x-handlebars-template">
-      <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button><br><br>
+      <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button><br><br> -->
     </script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+
     <script>
       (function() {
 
@@ -128,61 +157,16 @@
 
             });
 
-            $.ajax({
-              url: '/getgenres',
-              data: {
-                'access_token': access_token,
-              }
-            }).done(function(data) {
-              songPlaceholder.innerHTML = songTemplate({
-                access_token: access_token,
-                genres: data
-              });
-            });
-
-            $('#genres').show();
-
           } else {
               // render initial screen
               $('#login').show();
               $('#loggedin').hide();
           }
 
-
-          document.getElementById('obtain-new-token').addEventListener('click', function() {
-            $.ajax({
-              url: '/refresh_token',
-              data: {
-                'refresh_token': refresh_token
-              }
-            }).done(function(data) {
-              access_token = data.access_token;
-              oauthPlaceholder.innerHTML = oauthTemplate({
-                access_token: access_token,
-                refresh_token: refresh_token
-              });
-            });
-          }, false);
-
-
-          // document.getElementById('invoke-song-list').addEventListener('click', function() {
-          //
-          //   $.ajax({
-          //     url: '/getsong',
-          //     data: {
-          //       'access_token': access_token
-          //     }
-          //   }).done(function(data) {
-          //     songPlaceholder.innerHTML = songTemplate({
-          //       song_data: data
-          //     });
-          //   });
-          //   $('#songlist').show();
-          //
-          // }, false);
         }
 
       })();
     </script>
-  </body>
-</html>
+
+
+</body></html>

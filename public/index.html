@@ -24,13 +24,13 @@
 
   <body style="">
     <div class="container">
-      <div id="login" style="display: none;">
+      <div id="login">
         <a href="/login"><img class="media-object" width="500" src="http://www.digia.com/globalassets/yritys/logo/digia_logo_cmyk.png"></a>
       </div>
       <div id="loggedin" style="display: block;">
         <div id="twitter-selection">
           <div id="handles">
-            <div class="col s12 m7" style="">
+            <div class="col s12 m4" style="">
               <h2 class="header">Let your voice out</h2>
               <div class="card horizontal" style="">
                 <div class="card-image" style="">
@@ -41,17 +41,17 @@
                     <h3>Give your profile data, Aimo suggest music you could like<p></p></h3>
                     <form id="handle" action="/get-twitter" method="get">
                       <input type="text" name="thandle" maxlength="100" placeholder="Your Twitter name!" style="border: 2px solid purple;border-radius: 8px;">
-                      <input type="hidden" name="access_token" value="{{access_token}}">
-        		            <textarea rows="10" cols="100" name="profile" maxlength="5000" placeholder="Tell us more about you!" style="border: 2px solid purple;border-radius: 8px;"></textarea>
+                      <input id="access_token" type="hidden" name="access_token" value="{{access_token}}">
+                        <textarea rows="10" cols="100" name="profile" maxlength="5000" placeholder="Tell us more about you!" style="border: 2px solid purple;border-radius: 8px;"></textarea>
                         <button type="submit" class="btn btn-large waves-effect waves-light purple">Get recommendation from Aimo</button>
                     </form>
 
-                    <div id="user-profile">
-                      <h5>Logged in as {{display_name}}</h5>
-                    </div>
-                    <div id="oauth">
+                    <!-- <div id="user-profile">
+                      <h5 id="logged_in">Logged in as {{display_name}}</h5>
+                    </div> -->
+                    <!-- <div id="oauth">
                       <button class="btn btn-default waves-effect waves-light grey" id="obtain-new-token">Obtain new token using the refresh token</button><br><br>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -62,27 +62,7 @@
     </div>
 
     <script id="twitter-query-template" type="text/x-handlebars-template">
-      <div id="handles">
-        <p class="bold">Let your voice out.</p>
-        <p>Give your profile data, Aimo suggest music you could like</p>
-        <form id="handle" action="/get-twitter" method="get">
-          <input type="text" name="thandle" maxlength="100" placeholder="Your Twitter name!">
-          <input type="hidden" name="access_token" value="{{access_token}}"></input>
-          <div class="input-field col s12">
-            <textarea class="materialize-textarea" rows="10" cols="100" name="profile" maxlength="5000" placeholder="Tell us more about you!" style="border: 2px solid purple;border-radius: 8px;"></textarea>
-          </div>
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </script>
 
-
-    <script id="user-profile-template" type="text/x-handlebars-template">
-      <h3>Logged in as {{display_name}}</h3>
-    </script>
-
-    <script id="oauth-template" type="text/x-handlebars-template">
-      <!-- <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button><br><br> -->
     </script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
@@ -104,18 +84,6 @@
           return hashParams;
         }
 
-        var userProfileSource = document.getElementById('user-profile-template').innerHTML,
-            userProfileTemplate = Handlebars.compile(userProfileSource),
-            userProfilePlaceholder = document.getElementById('user-profile');
-
-        var oauthSource = document.getElementById('oauth-template').innerHTML,
-            oauthTemplate = Handlebars.compile(oauthSource),
-            oauthPlaceholder = document.getElementById('oauth');
-
-        var twitterSource = document.getElementById('twitter-query-template').innerHTML,
-            twitterTemplate = Handlebars.compile(twitterSource),
-            twitterPlaceholder = document.getElementById('twitter-selection');
-
         var params = getHashParams();
 
         var access_token = params.access_token,
@@ -128,16 +96,10 @@
         if (error) {
           alert('There was an error during the authentication');
         } else {
-          if (access_token) {
-            // render oauth info
-            oauthPlaceholder.innerHTML = oauthTemplate({
-              access_token: access_token,
-              refresh_token: refresh_token
-            });
 
-            twitterPlaceholder.innerHTML = twitterTemplate({
-              access_token: access_token
-            });
+          if (access_token) {
+
+            document.getElementById('access_token').value = access_token;
 
             $.ajax({
                 url: 'https://api.spotify.com/v1/me',
@@ -145,12 +107,8 @@
                   'Authorization': 'Bearer ' + access_token
                 },
                 success: function(response) {
-                  userProfilePlaceholder.innerHTML = userProfileTemplate(response);
-
 
                   $('#login').hide();
-                  $('#songlist').hide();
-                  $('#genres').hide();
                   $('#loggedin').show();
                   $('#twitter-selection').show();
                 }

@@ -120,7 +120,10 @@ app.get('/get-twitter', function(req, res) {
   };
 
   const preparerequest = function(options) {
-    return Promise.resolve(personalityrequest(options));
+    var ibm_username = process.env.IBM_USER_NAME;
+    var ibm_password = process.env.IBM_PASSWORD;
+
+    return Promise.resolve(personalityrequest(options, ibm_username, ibm_password));
   };
 
   const personalityinsights = function(persOptions) {
@@ -134,7 +137,7 @@ app.get('/get-twitter', function(req, res) {
         var message = parsepersonalityresponse(JSON.parse(body));
         if (message.substring(0,3) === '400') {
           var mesLen = message.length + 2;
-          aimessage = 'Message from Artificial Intelligence: ' + message.substring(4, mesLen) + '<br><br>';
+          aimessage = 'Message from Artificial Intelligence: ' + message.substring(3,mesLen) + '<br><br>';
           message = 'rock,alternative';
           seed_genres_default = 'AImo could not find your preferences. AIMo likes these, maybe you would too: ';
         }

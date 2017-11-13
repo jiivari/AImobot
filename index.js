@@ -82,7 +82,7 @@ app.get('/getgenres', function(req, res) {
 
 app.get('/get-twitter', function(req, res) {
 
-
+  var returnString = '';
   var additionalText = req.query.profile
   var twitterhandle = req.query.thandle;
   var request = require('request');
@@ -134,12 +134,29 @@ app.get('/get-twitter', function(req, res) {
           resolve(error.message)
         }
         console.log(body);
+
         var message = parsepersonalityresponse(JSON.parse(body));
         if (message.substring(0,3) === '400') {
           var mesLen = message.length + 2;
           aimessage = 'Message from Artificial Intelligence: ' + message.substring(3,mesLen) + '<br><br>';
           message = 'rock,alternative';
           seed_genres_default = 'AImo could not find your preferences. AIMo likes these, maybe you would too: ';
+        } else {
+
+          var tools = require('./tools');
+          var metrics = ["estj", "intj", "istj", "entj", "entp", "intp", "istp", "entp", "esfj", "isfj", "enfj", "infj", "esfp", "isfp", "enfp", "infp"];
+          var lenMetric = metrics.length;
+          console.log(lenMetric);
+
+          var minMetric = tools.compareTo(JSON.parse(body), metrics);
+
+          var bricks = require('./data/bricks.json');
+          
+          var bricksDesc = require('./data/bricksDesc.json');
+
+          console.log(bricksDesc);
+          returnString = tools.getMetricHtml(bricksDesc[minMetric],bricks[minMetric]);
+          console.log(returnString);
         }
         seed_genres_used = message;
 
@@ -184,7 +201,7 @@ app.get('/get-twitter', function(req, res) {
         }
         //var message = parsepersonalityresponse(JSON.parse(body));
         jsonContent = JSON.parse(body);
-        var htmlmessage = '<h2>' + aimessage + seed_genres_default + seed_genres_used + '</h2>';
+        var htmlmessage = returnString + '<h3>More information about personalities: </h3><p>https://www.16personalities.com/personality-types<br></p><br><h3>Music recommendation based on the personality analysis:' + aimessage + seed_genres_default + seed_genres_used + '</h3><br>';
         for (var index in jsonContent.tracks){
           if (jsonContent.tracks[index].name == null) {
             data = {};

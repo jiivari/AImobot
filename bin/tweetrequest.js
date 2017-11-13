@@ -3,7 +3,8 @@ module.exports = function(twitterhandle) {
   var qs = require('querystring');
   var resultType = '&result_type=popular';
 
-  var uri = 'https://api.twitter.com/1.1/search/tweets.json?q=' + qs.escape('from:' + twitterhandle) + '&count=100';
+  // var uri = 'https://api.twitter.com/1.1/search/tweets.json?q=' + qs.escape('from:' + twitterhandle) + '&count=100';
+  var uri = 'https://api.twitter.com/1.1/statuses/user_timeline.json?q=' + qs.escape('screen_name:' + twitterhandle) + '&count=100';
 
   console.log (uri);
 

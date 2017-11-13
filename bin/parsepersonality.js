@@ -18,7 +18,7 @@ module.exports = function(jsonContent) {
         returnString = '';
       } else if (jsonContent.consumption_preferences[index].consumption_preference_category_id == 'consumption_preferences_music') {
         for (var consindex in jsonContent.consumption_preferences[index].consumption_preferences) {
-          if (jsonContent.consumption_preferences[index].consumption_preferences[consindex].score == '1') {
+          if (jsonContent.consumption_preferences[index].consumption_preferences[consindex].score == '1' || jsonContent.consumption_preferences[index].consumption_preferences[consindex].score == '0.5' ) {
             switch(jsonContent.consumption_preferences[index].consumption_preferences[consindex].consumption_preference_id) {
               case 'consumption_preferences_music_rap':
                 returnString = returnString + 'hip-hop' + ',';

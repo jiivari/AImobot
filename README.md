@@ -4,6 +4,8 @@ AImobot listens to localhost:8888
 
 Spotify, twitter, IBM accounts are required.
 
+testing
+
 .env
 
 **Spotify credentials**
